@@ -77,7 +77,8 @@
       <div class="row">
         <div class="col-sm-12" align="center">
           <form onsubmit="return false;">
-            <button class="btn btn-primary btn-lg" v-on:click="insertDataToDB">Insert DB</button>
+            <button class="btn btn-warning btn-lg" v-on:click="reCheck">Re Check</button>
+            <button class="btn btn-success btn-lg" v-on:click="insertDataToDB">Finish</button>
           </form>
         </div>
       </div>
@@ -100,8 +101,13 @@ export default {
       dataShow: false,
       bgColor: '#f1c40f',
       showImages: false,
+      status: 'INIT',
+      statusLock: 'NON_LOCK',
+      lockDetail: 'NON',
+      unlockBy: 'NON',
       mp3Pass: new Audio(require('../assets/mp3/pass.mp3')),
-      mp3Fail: new Audio(require('../assets/mp3/fail.mp3'))
+      mp3Fail: new Audio(require('../assets/mp3/fail.mp3')),
+      fileData: 'database.csv'
     }
   },
   mounted () {
@@ -126,14 +132,24 @@ export default {
     setBackgroundColor (balance) {
       if (balance > 0) {
         this.mp3Pass.play()
+        this.bgColor = '#f1c40f'
+        this.status = 'FAIL'
+        this.statusLock = 'LOCK'
+        this.lockDetail = 'Short pack (Part Master = ' + this.masterQty + ' Qty | Part compart = ' + this.totalBalance + ' Qyy)'
       }
       if (balance === 0) {
         this.mp3Pass.play()
         this.bgColor = '#2ecc71'
+        this.status = 'PASS'
+        this.statusLock = 'NON'
+        this.lockDetail = 'NON'
       }
       if (balance < 0) {
         this.bgColor = '#c0392b'
         this.mp3Fail.play()
+        this.status = 'FAIL'
+        this.statusLock = 'LOCK'
+        this.lockDetail = 'Over pack (Part Master = ' + this.masterQty + ' Qty | Part compart = ' + this.totalBalance + ' Qyy)'
       }
     },
     comparePart () {
@@ -144,10 +160,57 @@ export default {
       } else {
         this.showImages = false
         this.mp3Fail.play()
+        this.status = 'FAIL'
+        this.statusLock = 'LOCK'
+        this.lockDetail = 'Part wong (Part Master = ' + this.partMaster + ' | Part compart = ' + this.partCompare + ')'
       }
     },
+    reCheck () {
+      this.partMaster = this.$route.params.partMaster
+      this.bachNumberMaster = this.$route.params.batchMasterNo
+      this.masterQty = this.$route.params.masterQty
+      this.totalBalance = this.masterQty
+      this.$refs.barcodeCompare.focus()
+      this.dataShow = false
+    },
     insertDataToDB () {
-      console.log('test')
+      let today = new Date()
+      let fullYear = today.getFullYear() + ''
+      let month = (today.getMonth() + 1) + ''
+      let day = today.getDate() + ''
+      let hour = today.getHours() + ''
+      let minutes = today.getMinutes() + ''
+      let fullDate = day + '-' + month + '-' + fullYear + '-' + hour + ':' + minutes
+      let dataString = fullDate + ',' + this.partMaster + ',' + this.masterQty + ',' + this.status + ',' + this.statusLock + ',' + this.lockDetail + ',' + this.unlockBy + '\n'
+      if (this.status === 'FAIL') {
+        let res = confirm('Confirm finish')
+        if (res) {
+          this.writeFileDatabase(dataString)
+        } else {
+          return false
+        }
+      }
+      if (this.status === 'PASS') {
+        this.writeFileDatabase(dataString)
+        this.$router.push({ name: 'master-barcode' })
+      }
+      if (this.status === 'INIT') {
+        this.$router.push({ name: 'master-barcode' })
+      }
+    },
+    writeFileDatabase (dataInsert) {
+      const fs = require('fs')
+      fs.readFile(this.fileData, 'utf-8', (err, data) => {
+        if (err) {
+          alert('cannot read file')
+          return
+        }
+        fs.writeFile(this.fileData, data + dataInsert, (wErr) => {
+          if (wErr) {
+            alert('cannot write file')
+          }
+        })
+      })
     }
   }
 }

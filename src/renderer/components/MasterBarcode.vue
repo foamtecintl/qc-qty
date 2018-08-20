@@ -9,7 +9,7 @@
       <div class="col-sm-12">
         <form onsubmit="return false;">
           <div class="form-group">
-            <input type="text" class="form-control input-lg" v-model="barcodeMaster" v-on:keyup="validateOnEnterKey" autofocus="autofocus">
+            <input type="text" ref='barcodeMaster' class="form-control input-lg" v-model="barcodeMaster" v-on:keyup="validateOnEnterKey" autofocus="autofocus">
           </div>
         </form>
       </div>
@@ -33,6 +33,9 @@ export default {
       batchMasterNo: '',
       masterQty: 0
     }
+  },
+  mounted () {
+    this.$refs.barcodeMaster.focus()
   },
   methods: {
     validateOnEnterKey (event) {
