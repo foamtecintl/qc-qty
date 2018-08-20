@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -9,14 +9,6 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 if (process.env.NODE_ENV !== 'development') {
   global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
-
-let knex = require('knex')({
-  client: 'sqlite3',
-  connection: {
-    filename: 'database.db',
-    useNullAsDefault: true
-  }
-})
 
 let mainWindow
 const winURL = process.env.NODE_ENV === 'development'
@@ -37,10 +29,6 @@ function createWindow () {
 
   mainWindow.on('closed', () => {
     mainWindow = null
-  })
-
-  ipcMain.on('testInsert', () => {
-    knex('coords').insert([{x: 20}, {y: 30}, {x: 10, y: 20}])
   })
 }
 
