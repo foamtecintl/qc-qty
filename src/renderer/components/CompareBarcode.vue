@@ -30,7 +30,7 @@
         <div class="col-sm-12">
           <form onsubmit="return false;">
             <div class="form-group">
-              <input type="text" ref='barcodeCompare' class="form-control input-lg" v-model="barcodeCompare" v-on:keyup="compareOnEnterKey" autofocus="autofocus">
+              <input type="text" ref="barcodeCompare" class="form-control input-lg" v-model="barcodeCompare" v-on:keyup="compareOnEnterKey" autofocus="autofocus">
             </div>
           </form>
         </div>
@@ -87,6 +87,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'compare-barcode',
   data () {
@@ -135,7 +137,7 @@ export default {
         this.bgColor = '#f1c40f'
         this.status = 'FAIL'
         this.statusLock = 'LOCK'
-        this.lockDetail = 'Short pack (Part Master = ' + this.masterQty + ' Qty | Part compart = ' + this.totalBalance + ' Qyy)'
+        this.lockDetail = 'Short pack part ' + this.partMaster + '(Part Master = ' + this.masterQty + ' Qty | Part compart = ' + this.totalBalance + ' Qty)'
       }
       if (balance === 0) {
         this.mp3Pass.play()
@@ -149,7 +151,7 @@ export default {
         this.mp3Fail.play()
         this.status = 'FAIL'
         this.statusLock = 'LOCK'
-        this.lockDetail = 'Over pack (Part Master = ' + this.masterQty + ' Qty | Part compart = ' + this.totalBalance + ' Qyy)'
+        this.lockDetail = 'Over pack ' + this.partMaster + '(Part Master = ' + this.masterQty + ' Qty | Part compart = ' + this.totalBalance + ' Qty)'
       }
     },
     comparePart () {
@@ -174,43 +176,36 @@ export default {
       this.dataShow = false
     },
     insertDataToDB () {
-      let today = new Date()
-      let fullYear = today.getFullYear() + ''
-      let month = (today.getMonth() + 1) + ''
-      let day = today.getDate() + ''
-      let hour = today.getHours() + ''
-      let minutes = today.getMinutes() + ''
-      let fullDate = day + '-' + month + '-' + fullYear + '-' + hour + ':' + minutes
-      let dataString = fullDate + ',' + this.partMaster + ',' + this.masterQty + ',' + this.status + ',' + this.statusLock + ',' + this.lockDetail + ',' + this.unlockBy + '\n'
+      let dataSave = {
+        partMaster: this.partMaster,
+        qtyMaster: this.masterQty + '',
+        status: this.status,
+        detail: this.lockDetail,
+        unlockBy: this.unlockBy
+      }
       if (this.status === 'FAIL') {
         let res = confirm('Confirm finish')
         if (res) {
-          this.writeFileDatabase(dataString)
+          this.writeFileDatabase(dataSave, 'lock-program')
         } else {
           return false
         }
       }
       if (this.status === 'PASS') {
-        this.writeFileDatabase(dataString)
-        this.$router.push({ name: 'master-barcode' })
+        this.writeFileDatabase(dataSave, 'master-barcode')
       }
       if (this.status === 'INIT') {
         this.$router.push({ name: 'master-barcode' })
       }
     },
-    writeFileDatabase (dataInsert) {
-      const fs = require('fs')
-      fs.readFile(this.fileData, 'utf-8', (err, data) => {
-        if (err) {
-          alert('cannot read file')
-          return
-        }
-        fs.writeFile(this.fileData, data + dataInsert, (wErr) => {
-          if (wErr) {
-            alert('cannot write file')
-          }
+    writeFileDatabase (dataInsert, page) {
+      axios.post(`http://localhost:8090/save`, JSON.stringify(dataInsert))
+        .then(res => {
+          this.$router.push({ name: page })
         })
-      })
+        .catch(err => {
+          alert(err)
+        })
     }
   }
 }

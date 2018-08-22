@@ -9,7 +9,7 @@
       <div class="col-sm-12">
         <form onsubmit="return false;">
           <div class="form-group">
-            <input type="text" ref='barcodeMaster' class="form-control input-lg" v-model="barcodeMaster" v-on:keyup="validateOnEnterKey" autofocus="autofocus">
+            <input type="text" ref="barcodeMaster" class="form-control input-lg" v-model="barcodeMaster" v-on:keyup="validateOnEnterKey" autofocus="autofocus">
           </div>
         </form>
       </div>
@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'master-barcode',
   data () {
@@ -35,6 +37,7 @@ export default {
     }
   },
   mounted () {
+    this.checkStatus()
     this.$refs.barcodeMaster.focus()
   },
   methods: {
@@ -56,6 +59,17 @@ export default {
           alert('Barcode wong')
         }
       }
+    },
+    checkStatus () {
+      axios.post(`http://localhost:8090/check`)
+        .then(res => {
+          if (res.data.status === 'FAIL') {
+            this.$router.push({ name: 'lock-program' })
+          }
+        })
+        .catch(err => {
+          alert(err)
+        })
     }
   }
 }

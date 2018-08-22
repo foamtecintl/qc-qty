@@ -16,6 +16,11 @@ export default new Router({
       component: require('@/components/CompareBarcode').default
     },
     {
+      path: '/lock',
+      name: 'lock-program',
+      component: require('@/components/LockProgram').default
+    },
+    {
       path: '*',
       redirect: '/'
     }
