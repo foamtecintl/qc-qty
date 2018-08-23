@@ -7,8 +7,23 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'landing-page',
-      component: require('@/components/LandingPage').default
+      name: 'master-barcode',
+      component: require('@/components/MasterBarcode').default
+    },
+    {
+      path: '/compare',
+      name: 'compare-barcode',
+      component: require('@/components/CompareBarcode').default
+    },
+    {
+      path: '/lock',
+      name: 'lock-program',
+      component: require('@/components/LockProgram').default
+    },
+    {
+      path: '/logdata',
+      name: 'log-data',
+      component: require('@/components/LogData').default
     },
     {
       path: '*',
