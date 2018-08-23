@@ -56,7 +56,11 @@ export default {
             }
           })
         } else {
-          alert('Barcode wong')
+          if (this.barcodeMaster === '1234567890') {
+            this.$router.push({ name: 'log-data' })
+          } else {
+            alert('Barcode wong')
+          }
         }
       }
     },

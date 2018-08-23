@@ -21,6 +21,11 @@ export default new Router({
       component: require('@/components/LockProgram').default
     },
     {
+      path: '/logdata',
+      name: 'log-data',
+      component: require('@/components/LogData').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

@@ -137,7 +137,7 @@ export default {
         this.bgColor = '#f1c40f'
         this.status = 'FAIL'
         this.statusLock = 'LOCK'
-        this.lockDetail = 'Short pack part ' + this.partMaster + '(Part Master = ' + this.masterQty + ' Qty | Part compart = ' + this.totalBalance + ' Qty)'
+        this.lockDetail = 'Short pack part ' + this.partMaster + '(Part Master = ' + this.masterQty + ' Qty | Part compare = ' + this.totalBalance + ' Qty)'
       }
       if (balance === 0) {
         this.mp3Pass.play()
@@ -151,7 +151,7 @@ export default {
         this.mp3Fail.play()
         this.status = 'FAIL'
         this.statusLock = 'LOCK'
-        this.lockDetail = 'Over pack ' + this.partMaster + '(Part Master = ' + this.masterQty + ' Qty | Part compart = ' + this.totalBalance + ' Qty)'
+        this.lockDetail = 'Over pack ' + this.partMaster + '(Part Master = ' + this.masterQty + ' Qty | Part compare = ' + this.totalBalance + ' Qty)'
       }
     },
     comparePart () {
@@ -164,10 +164,11 @@ export default {
         this.mp3Fail.play()
         this.status = 'FAIL'
         this.statusLock = 'LOCK'
-        this.lockDetail = 'Part wong (Part Master = ' + this.partMaster + ' | Part compart = ' + this.partCompare + ')'
+        this.lockDetail = 'Part wong (Part Master = ' + this.partMaster + ' | Part compare = ' + this.partCompare + ')'
       }
     },
     reCheck () {
+      this.bgColor = '#f1c40f'
       this.partMaster = this.$route.params.partMaster
       this.bachNumberMaster = this.$route.params.batchMasterNo
       this.masterQty = this.$route.params.masterQty
