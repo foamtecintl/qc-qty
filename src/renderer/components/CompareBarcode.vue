@@ -30,7 +30,7 @@
         <div class="col-sm-12">
           <form onsubmit="return false;">
             <div class="form-group">
-              <input type="text" ref="barcodeCompare" class="form-control input-lg" v-model="barcodeCompare" v-on:keyup="compareOnEnterKey" autofocus="autofocus">
+              <input type="text" ref="barcodeCompare" class="form-control input-lg" v-model="barcodeCompare" v-on:keyup="compareOnEnterKey" autofocus="autofocus" :disabled="disabledInput">
             </div>
           </form>
         </div>
@@ -109,7 +109,7 @@ export default {
       unlockBy: 'NON',
       mp3Pass: new Audio(require('../assets/mp3/pass.mp3')),
       mp3Fail: new Audio(require('../assets/mp3/fail.mp3')),
-      fileData: 'database.csv'
+      disabledInput: false
     }
   },
   mounted () {
@@ -151,6 +151,7 @@ export default {
         this.mp3Fail.play()
         this.status = 'FAIL'
         this.statusLock = 'LOCK'
+        this.disabledInput = true
         this.lockDetail = 'Over pack ' + this.partMaster + '(Part Master = ' + this.masterQty + ' Qty | Part compare = ' + this.totalBalance + ' Qty)'
       }
     },
@@ -164,10 +165,12 @@ export default {
         this.mp3Fail.play()
         this.status = 'FAIL'
         this.statusLock = 'LOCK'
+        this.disabledInput = true
         this.lockDetail = 'Part wong (Part Master = ' + this.partMaster + ' | Part compare = ' + this.partCompare + ')'
       }
     },
     reCheck () {
+      this.disabledInput = false
       this.bgColor = '#f1c40f'
       this.partMaster = this.$route.params.partMaster
       this.bachNumberMaster = this.$route.params.batchMasterNo
